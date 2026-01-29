@@ -54,7 +54,19 @@ def get_user_data_dir() -> Path:
         try:
             with open(SETTINGS_FILE, "r") as f:
                 data = json.load(f)
-                return Path(data["data_dir"])
+                path = Path(data["data_dir"])
+
+            # --- THE VALIDATION CHECK ---
+            if not path.exists():
+                print(f"\n{'!'*60}")
+                print(f"[!] WARNING: Your saved data directory is no longer accessible:")
+                print(f"    Path: {path}")
+                print("\nPlease review the path above or set a new one by running:")
+                print("    oscar.set_data_dir('/new/path')")
+                print(f"{'!'*60}\n")
+                return None
+            
+            return path
         except (KeyError, json.JSONDecodeError):
             return None
     return None
