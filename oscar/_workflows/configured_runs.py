@@ -40,10 +40,10 @@ def run_configured(
     region_final = region    or defaults['region']
     
     scen_input   = scenario or defaults['scenario']
-    scen_final   = [scen_input] if isinstance(scen_input, str) else scen_input
+    scen_final   = [scen_input] if isinstance(scen_input, str) else list(scen_input)
     
     vars_input   = variables or defaults['variables']
-    vars_final   = [vars_input] if isinstance(vars_input, str) else vars_input
+    vars_final   = [vars_input] if isinstance(vars_input, str) else list(vars_input)
 
     hist_end_year   = menu['hist_list'][hist_final]
     scen_start_year = hist_end_year + 1
