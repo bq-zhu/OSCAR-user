@@ -30,14 +30,12 @@ ENV/
 # ------------------
 # Legacy / archived files (local only)  --------> TO BE REMOVED FROM REPO AND HERE <--------
 # ------------------
-archive/
+# archive #tracked for dev version
 
 # ------------------
 # Data (full input data to be acquired from external sources, only keep bootstrap / sampled data in the repo)
 # ------------------
 data/
-devtools/
-data-user/
 
 # ------------------
 # Python cache / bytecode

@@ -1,7 +1,7 @@
 """
 OSCAR Smoke Test
 Purpose: Rapidly verify that the package structure and core logic are functional.
-Run with: python tests/smoke_test.py
+Run with: python dev/tests/smoke_test.py
 """
 import os
 import sys
@@ -9,7 +9,7 @@ from pathlib import Path
 import xarray as xr
 
 # 1. Ensure the script can find the local 'oscar' package
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
 
 def run_verification():
     print("--- OSCAR SMOKE TEST START ---")
@@ -34,7 +34,7 @@ def run_verification():
         
         # 4. Tiny Model Run (2 configurations, 2 years only)
         from oscar._core.mod_process import OSCAR
-        print("v Testing core ODE solver (Mini-run)...")
+        print("v Testing core OSCAR model (Mini-run)...")
         
         Par = xr.open_dataset(par_path).load()
         For = xr.open_dataset(b_dir / "forcing_scen_standard.nc").isel(year=slice(0, 2)).load()
