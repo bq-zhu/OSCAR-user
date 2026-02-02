@@ -48,7 +48,8 @@ def set_data_dir(path=None):
 def get_user_data_dir() -> Path:
     """
     Retrieves the saved data directory from the local settings file.
-    Returns None if never set.
+    Provides validation if the path is inaccessible.
+    Returns None if never set. 
     """
     if SETTINGS_FILE.exists():
         try:
@@ -84,6 +85,7 @@ def resolve_data_root(user_provided=None):
     root = user_provided or get_user_data_dir()
     
     if root is None:
+        print("\n[OSCAR] No data directory configured. Please set one to proceed.\n")
         # DO NOT raise ValueError here anymore. 
         # Just return None so run.py can show the Welcome Guide.
         return None
@@ -94,12 +96,26 @@ def get_in_dir(user_provided=None):
     """
     Returns the Path to the raw input data (drivers, etc.).
     Points to {data_root}/input_data/
+    Enforces a strict check to ensure the library is present.
     """
     # 1. Resolve the base data directory (saved setting or user arg)
     root = resolve_data_root(user_provided)
     
     # 2. Point to the input_data subfolder
     path = root / "input_data"
+
+    # 3. STRICT CHECK: Ensure the library is present before proceeding
+    if not path.exists():
+        # Using a clear, bordered message for the user
+        msg = (
+            f"\n{'!'*60}\n"
+            f"[OSCAR ERROR] Scientific input data missing.\n"
+            f"Location: {path}\n\n"
+            f"REQUIRED ACTION:\n"
+            f"Please download the input library first. (Step to be finalized)\n"
+            f"{'!'*60}\n"
+        )
+        raise FileNotFoundError(msg)
     
     return path.resolve()
 
@@ -116,12 +132,13 @@ def get_out_dir(user_provided=None):
         path = Path(user_provided)
     else:
         # Check if a persistent data directory is set
-        user_root = get_user_data_dir()
-        if user_root:
+        user_data_root = get_user_data_dir()
+        if user_data_root:
             # Save results in the large data drive
-            path = user_root / "results"
+            path = user_data_root / "results"
         else:
             # Default fallback to the project root
+            print("\n[OSCAR] No data directory configured. Using default results path.\n") # this is likely never used
             path = PACKAGE_ROOT / "data" / "results"
 
     path = path.expanduser().resolve()

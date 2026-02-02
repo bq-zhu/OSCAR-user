@@ -42,8 +42,7 @@ def run_standard(show_plot=True, run_model=True,**kwargs):
         Out_all = apply_variable_metadata(Out_all)
 
         # 5. Save results
-        # Use NETCDF3_64BIT for robustness on all systems
-        Out_all.to_netcdf(out_file, format="NETCDF3_64BIT")
+        Out_all.to_netcdf(out_file, engine="h5netcdf")
         print(f"Success! Data saved to: {out_file}")
         
     else:

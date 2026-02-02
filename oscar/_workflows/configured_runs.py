@@ -94,7 +94,7 @@ def run_configured(
         Out_all = apply_variable_metadata(Out_all)
 
         # 9. SAVE
-        Out_all.to_netcdf(out_file, format="NETCDF3_64BIT")
+        Out_all.to_netcdf(out_file, engine="h5netcdf")
         print(f"Success! Data saved to: {out_file}")
     
     else:
