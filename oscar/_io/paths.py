@@ -132,10 +132,10 @@ def get_out_dir(user_provided=None):
         path = Path(user_provided)
     else:
         # Check if a persistent data directory is set
-        user_root = get_user_data_dir()
-        if user_root:
+        user_data_root = get_user_data_dir()
+        if user_data_root:
             # Save results in the large data drive
-            path = user_root / "results"
+            path = user_data_root / "results"
         else:
             # Default fallback to the project root
             print("\n[OSCAR] No data directory configured. Using default results path.\n") # this is likely never used
