@@ -4,7 +4,7 @@ Handles the retrieval of official pre-compiled CMIP6/7 regional libraries.
 """
 import zipfile
 import requests
-from .paths import get_configured_dir
+from .paths import get_configured_library_dir
 from .._utils.load_config import load_config
 
 def ensure_configured_library(hist_type, region):
@@ -13,7 +13,7 @@ def ensure_configured_library(hist_type, region):
     If missing, downloads and extracts the official bundle from Zenodo.
     """
     # 1. Resolve local path: data/configured/CMIP6/RCP_5reg/
-    target_dir = get_configured_dir() / hist_type / region
+    target_dir = get_configured_library_dir() / hist_type / region
     
     # Representative file check to see if library is already there
     if (target_dir / "forcing_hist.nc").exists():

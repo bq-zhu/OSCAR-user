@@ -1,0 +1,99 @@
+# ==============================================================================
+# OSCAR INPUT SPECIES REGISTRY
+# ==============================================================================
+# This file defines all valid input variables for the 'Customized' mode.
+# Units are synchronized with the core physics engine (mod_process.py).
+# ==============================================================================
+
+# 1. ANTHROPOGENIC EMISSIONS
+# Expected Format: [scenario, year, region, species, value]
+emissions:
+  Eff: 
+    description: "Fossil CO2 emissions"
+    unit: "PgC yr-1"
+  Eluc: 
+    description: "Land-use change CO2 emissions"
+    unit: "PgC yr-1"
+  E_CH4: 
+    description: "Anthropogenic CH4 emissions"
+    unit: "TgC yr-1"
+  E_N2O: 
+    description: "Anthropogenic N2O emissions"
+    unit: "TgN yr-1"
+  E_NOX: 
+    description: "Nitrogen Oxides (NOx) emissions"
+    unit: "TgN yr-1"
+  E_SO2: 
+    description: "Sulfur Dioxide (SO2) emissions"
+    unit: "TgS yr-1"
+  E_VOC: 
+    description: "Volatile Organic Compounds (VOC) emissions"
+    unit: "Tg yr-1"
+  E_BC: 
+    description: "Black Carbon (BC) emissions"
+    unit: "Tg yr-1"
+  E_OC: 
+    description: "Organic Carbon (OC) emissions"
+    unit: "Tg yr-1"
+  E_NH3: 
+    description: "Ammonia (NH3) emissions"
+    unit: "TgN yr-1"
+  E_CO: 
+    description: "Carbon Monoxide (CO) emissions"
+    unit: "Tg yr-1"
+  E_Xhalo: 
+    description: "Halogenated species emissions"
+    unit: "Gg yr-1"
+
+# 2. LAND-USE AND LAND-COVER CHANGE (LULCC)
+# Expected Format: [scenario, year, region, bio_from, bio_to, value]
+lulcc:
+  d_Acover: 
+    description: "Net change in land-cover area"
+    unit: "Mha yr-1"
+  d_Ashift: 
+    description: "Internal shift in land-use area"
+    unit: "Mha yr-1"
+  d_Hwood: 
+    description: "Wood harvest (Area-based)"
+    unit: "Mha yr-1"
+
+# 3. RADIATIVE FORCING ANOMALIES (Global)
+# Expected Format: [scenario, year, variable, value]
+rf:
+  RF_solar: 
+    description: "Solar radiative forcing anomaly (pre-industrial baseline)"
+    unit: "W m-2"
+  RF_volc: 
+    description: "Volcanic radiative forcing anomaly (pre-industrial baseline)"
+    unit: "W m-2"
+  RF_contr: 
+    description: "Linear contrails and cirrus radiative forcing (pre-industrial baseline)"
+    unit: "W m-2"
+
+# 4. ATMOSPHERIC CONCENTRATIONS CHANGE
+# Expected Format: [scenario, year, species, value]
+conc:
+  D_CO2: 
+    description: "Atmospheric CO2 concentration change (pre-industrial baseline)"
+    unit: "ppm"
+  D_CH4: 
+    description: "Atmospheric CH4 concentration change (pre-industrial baseline)"
+    unit: "ppb"
+  D_N2O: 
+    description: "Atmospheric N2O concentration change (pre-industrial baseline)"
+    unit: "ppb"
+  D_Xhalo: 
+    description: "Halogenated species concentration change (pre-industrial baseline)"
+    unit: "ppt"
+
+# 5. REGISTERED HALOGENATED SPECIES (spc_halo) EMISSIONS AND CONCENTRATIONS
+# Supported halogenated species for E_Xhalo and D_Xhalo
+halogens: [
+  'C2F6', 'C3F8', 'C4F10', 'C5F12', 'C6F14', 'C7F16', 'CCl4', 'CF4',
+  'CFC-11', 'CFC-113', 'CFC-114', 'CFC-115', 'CFC-12', 'CH3Br', 'CH3CCl3',
+  'CH3Cl', 'HCFC-141b', 'HCFC-142b', 'HCFC-22', 'HFC-125', 'HFC-134a',
+  'HFC-143a', 'HFC-152a', 'HFC-227ea', 'HFC-23', 'HFC-236fa', 'HFC-245fa',
+  'HFC-32', 'HFC-365mfc', 'HFC-43-10mee', 'Halon-1202', 'Halon-1211',
+  'Halon-1301', 'Halon-2402', 'NF3', 'SF6', 'c-C4F8'
+]

@@ -1,0 +1,61 @@
+# ==============================================================================
+# OSCAR CEDS/RESCUE TRANSLATION REGISTRY (Wide Format)
+# ==============================================================================
+# Units in source: Mt for main species | kt for halogens
+# Target units: PgC, TgN, TgS, Tg species, Gg species
+# ==============================================================================
+
+# 1. Standard Emissions (Regional)
+# Format: "CEDS_Variable": ["OSCAR_ID", "Calculation"]
+emissions:
+  "CEDS+|9+ Sectors|Emissions|CO2|Total": ["Eff", "(12.011 / 44.009) / 1000"]
+  "CEDS+|9+ Sectors|Emissions|CH4|Total": ["E_CH4", "12.011 / 16.043"]
+  "CEDS+|9+ Sectors|Emissions|N2O|Total": ["E_N2O", "28.014 / 44.013"]
+  "CEDS+|9+ Sectors|Emissions|NOx|Total": ["E_NOX", "14.007 / 46.005"]
+  "CEDS+|9+ Sectors|Emissions|SO2|Total": ["E_SO2", "32.06 / 64.06"]
+  "CEDS+|9+ Sectors|Emissions|NH3|Total": ["E_NH3", "14.007 / 17.031"]
+  "CEDS+|9+ Sectors|Emissions|VOC|Total": ["E_VOC", "1.0"]
+  "CEDS+|9+ Sectors|Emissions|BC|Total":  ["E_BC", "1.0"]
+  "CEDS+|9+ Sectors|Emissions|OC|Total":  ["E_OC", "1.0"]
+  "CEDS+|9+ Sectors|Emissions|CO|Total":  ["E_CO", "1.0"]
+
+# 2. Halogenated Species (Global)
+# Format: "CEDS_Variable": ["E_Xhalo", "OSCAR_SPEC_ID", "Multiplier"]
+# Multiplier: 1.0 because kt (CEDS) = Gg (OSCAR)
+halogens:
+  "CEDS+|9+ Sectors|Emissions|HFC134a|Total": ["E_Xhalo", "HFC-134a", "1.0"]
+  "CEDS+|9+ Sectors|Emissions|HFC23|Total":   ["E_Xhalo", "HFC-23", "1.0"]
+  "CEDS+|9+ Sectors|Emissions|HFC32|Total":   ["E_Xhalo", "HFC-32", "1.0"]
+  "CEDS+|9+ Sectors|Emissions|HFC125|Total":  ["E_Xhalo", "HFC-125", "1.0"]
+  "CEDS+|9+ Sectors|Emissions|HFC143a|Total": ["E_Xhalo", "HFC-143a", "1.0"]
+  "CEDS+|9+ Sectors|Emissions|HFC152a|Total": ["E_Xhalo", "HFC-152a", "1.0"]
+  "CEDS+|9+ Sectors|Emissions|HFC227ea|Total": ["E_Xhalo", "HFC-227ea", "1.0"]
+  "CEDS+|9+ Sectors|Emissions|HFC236fa|Total": ["E_Xhalo", "HFC-236fa", "1.0"]
+  "CEDS+|9+ Sectors|Emissions|HFC245fa|Total": ["E_Xhalo", "HFC-245fa", "1.0"]
+  "CEDS+|9+ Sectors|Emissions|HFC365mfc|Total": ["E_Xhalo", "HFC-365mfc", "1.0"]
+  "CEDS+|9+ Sectors|Emissions|HFC4310mee|Total": ["E_Xhalo", "HFC-43-10mee", "1.0"]
+  "CEDS+|9+ Sectors|Emissions|CFC11|Total":   ["E_Xhalo", "CFC-11", "1.0"]
+  "CEDS+|9+ Sectors|Emissions|CFC12|Total":   ["E_Xhalo", "CFC-12", "1.0"]
+  "CEDS+|9+ Sectors|Emissions|CFC113|Total":  ["E_Xhalo", "CFC-113", "1.0"]
+  "CEDS+|9+ Sectors|Emissions|CFC114|Total":  ["E_Xhalo", "CFC-114", "1.0"]
+  "CEDS+|9+ Sectors|Emissions|CFC115|Total":  ["E_Xhalo", "CFC-115", "1.0"]
+  "CEDS+|9+ Sectors|Emissions|CCl4|Total":    ["E_Xhalo", "CCl4", "1.0"]
+  "CEDS+|9+ Sectors|Emissions|CH3CCl3|Total": ["E_Xhalo", "CH3CCl3", "1.0"]
+  "CEDS+|9+ Sectors|Emissions|HCFC22|Total":  ["E_Xhalo", "HCFC-22", "1.0"]
+  "CEDS+|9+ Sectors|Emissions|HCFC141b|Total": ["E_Xhalo", "HCFC-141b", "1.0"]
+  "CEDS+|9+ Sectors|Emissions|HCFC142b|Total": ["E_Xhalo", "HCFC-142b", "1.0"]
+  "CEDS+|9+ Sectors|Emissions|CH3Cl|Total":   ["E_Xhalo", "CH3Cl", "1.0"]
+  "CEDS+|9+ Sectors|Emissions|CH3Br|Total":   ["E_Xhalo", "CH3Br", "1.0"]
+  "CEDS+|9+ Sectors|Emissions|Halon1202|Total": ["E_Xhalo", "Halon-1202", "1.0"]
+  "CEDS+|9+ Sectors|Emissions|Halon1211|Total": ["E_Xhalo", "Halon-1211", "1.0"]
+  "CEDS+|9+ Sectors|Emissions|Halon1301|Total": ["E_Xhalo", "Halon-1301", "1.0"]
+  "CEDS+|9+ Sectors|Emissions|Halon2402|Total": ["E_Xhalo", "Halon-2402", "1.0"]
+  "CEDS+|9+ Sectors|Emissions|SF6|Total":     ["E_Xhalo", "SF6", "1.0"]
+  "CEDS+|9+ Sectors|Emissions|NF3|Total":     ["E_Xhalo", "NF3", "1.0"]
+  "CEDS+|9+ Sectors|Emissions|C2F6|Total":    ["E_Xhalo", "C2F6", "1.0"]
+  "CEDS+|9+ Sectors|Emissions|C3F8|Total":    ["E_Xhalo", "C3F8", "1.0"]
+  "CEDS+|9+ Sectors|Emissions|C4F10|Total":   ["E_Xhalo", "C4F10", "1.0"]
+  "CEDS+|9+ Sectors|Emissions|C5F12|Total":   ["E_Xhalo", "C5F12", "1.0"]
+  "CEDS+|9+ Sectors|Emissions|C6F14|Total":   ["E_Xhalo", "C6F14", "1.0"]
+  "CEDS+|9+ Sectors|Emissions|C7F16|Total":   ["E_Xhalo", "C7F16", "1.0"]
+  "CEDS+|9+ Sectors|Emissions|c-C4F8|Total":  ["E_Xhalo", "c-C4F8", "1.0"]
