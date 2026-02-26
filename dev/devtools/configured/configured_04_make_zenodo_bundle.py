@@ -1,36 +1,33 @@
 """
 OSCAR DevTool 04: Zenodo Bundler
-Action: Validates and Zips regional library components for Zenodo upload.
+Action: Injects version metadata and Zips regional library components.
 Target: data/export/bundles/
 
 -------------
 To run: 
-In terminal, at project root, execute:
-$env:PYTHONPATH="."; python dev/devtools/configured_04_make_zenodo_bundle.py
+$env:PYTHONPATH="."; python dev/devtools/configured/configured_04_make_zenodo_bundle.py
 -------------
-"""
-
-"""
-OSCAR DevTool 04: Zenodo Bundler
-Action: Injects version metadata and Zips regional library components.
 """
 import shutil
 import os
 import xarray as xr
 from pathlib import Path
 from oscar._utils.load_config import load_config
-from oscar._io.paths import get_configured_dir, resolve_data_root
+from oscar._io.paths import get_configured_library_dir, resolve_data_root
 
 def bundle_library():
-    # 1. Load Specs from YAML
-    full_cfg = load_config()
-    cfg = full_cfg['configured_options']
-    # Get the  version string (e.g., 2026.con.rc1)
-    version_str = full_cfg['metadata']['configured']['version']
+    # 1. Load Specs from Single Source of Truth
+    cfg_full = load_config()
+    registry = cfg_full['registry']
+    cfg_mode = cfg_full['configured_mode']
     
-    regions = cfg['region_list']
-    hist_list = cfg['hist_list'] 
-    nMC = cfg['official_nMC']
+    # Get the official version string from metadata
+    version_str = cfg_full['metadata']['configured']['version']
+    
+    # Registry defines all potential regions and histories
+    regions = registry['all_regions']
+    hist_list = registry['hist_versions'].keys()
+    n_mc = cfg_mode['official_nMC']
 
     # 2. Setup Export Paths
     data_root = resolve_data_root()
@@ -38,35 +35,50 @@ def bundle_library():
     export_root.mkdir(parents=True, exist_ok=True)
 
     print(f"--- OSCAR ZENODO BUNDLING (Version: {version_str}) ---")
+    print(f"Targeting HDF5 metadata injection for {n_mc} member ensembles.")
 
-    for region in regions:
-        for hist_name in hist_list:
-            print(f"Processing: {region} ({hist_name})")
+    for hist_name in hist_list:
+        for region in regions:
+            print(f"Processing: {hist_name} | {region}")
             
-            lib_base = get_configured_dir() / hist_name
+            lib_base = get_configured_library_dir() / hist_name
             source_dir = lib_base / region
             
-            # 3. Validation List
-            required = ["forcing_hist.nc", "forcing_scen.nc", 
-                        f"params_nMC{nMC}.nc", f"hist_results_nMC{nMC}.nc",
-                        f"ini_state_nMC{nMC}.nc"]
+            # 3. Validation List (The Contract of Required Assets)
+            # We use the official naming convention established in earlier steps
+            required = [
+                "forcing_hist.nc", 
+                "forcing_scen.nc", 
+                f"params_nMC{n_mc}.nc", 
+                f"hist_results_nMC{n_mc}.nc",
+                f"ini_state_nMC{n_mc}.nc"
+            ]
             
             missing = [f for f in required if not (source_dir / f).exists()]
             if missing:
-                print(f"  [ERROR] Skipping {region}: Missing {missing}")
+                # We only bundle what exists in the registry
+                print(f"  [SKIPPED] {region}: Missing {missing}")
                 continue
 
             # 4. INJECT VERSION METADATA (Scientific Signature)
-            # This ensures the NetCDF "remembers" its version forever
             for filename in required:
                 file_path = source_dir / filename
+                print(f"    - Injecting metadata into {filename}...")
+                
+                # Use .load() inside the context manager to pull all data into RAM
+                # then 'ds' is closed automatically at the end of the 'with' block
                 with xr.open_dataset(file_path) as ds:
                     ds_loaded = ds.load()
-                    ds_loaded.attrs['configured_library_version'] = version_str
-                    # Use NETCDF3 for speed/robustness on network drives
-                    ds_loaded.to_netcdf(file_path, format="NETCDF3_64BIT")
+                
+                # NOW the file is closed. We can safely overwrite it.
+                ds_loaded.attrs['configured_library_version'] = version_str
+                ds_loaded.attrs['official_ensemble_size'] = n_mc
+                
+                # Overwrite using NETCDF4 (HDF5)
+                ds_loaded.to_netcdf(file_path, format="NETCDF4", engine="netcdf4")
 
             # 5. ZIPPING
+            # Format: OSCAR_configured_CMIP6_RCP_5reg.zip
             zip_filename = f"OSCAR_configured_{hist_name}_{region}"
             zip_path = export_root / zip_filename
             
