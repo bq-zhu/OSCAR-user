@@ -12,10 +12,11 @@ Main Logic:
 import os
 import json
 from pathlib import Path
+import shutil
 
 # 1. IDENTIFY PACKAGE ROOT
 # Path logic: oscar/_io/paths.py -> _io -> oscar -> OSCAR-user/
-PACKAGE_ROOT = Path(__file__).resolve().parent.parent.parent
+PACKAGE_ROOT = Path(__file__).parent.parent.parent
 
 # 2. PERMANENT SETTINGS CONFIG (Local to the repository)
 # By saving here, deleting the repository removes all user traces.
@@ -48,8 +49,7 @@ def set_data_dir(path=None):
 def get_user_data_dir() -> Path:
     """
     Retrieves the saved data directory from the local settings file.
-    Provides validation if the path is inaccessible.
-    Returns None if never set. 
+    Validates if the physical directory is still accessible.
     """
     if SETTINGS_FILE.exists():
         try:
@@ -72,7 +72,7 @@ def get_user_data_dir() -> Path:
             return None
     return None
 
-# --- PUBLIC PATH RESOLVERS ---
+# --- WAREHOUSE (The Source) ---
 
 def resolve_data_root(user_provided=None):
     """
@@ -92,17 +92,32 @@ def resolve_data_root(user_provided=None):
         
     return Path(root)
 
+def get_library_dir(user_provided=None):
+    """Points to {root}/library/"""
+    root = resolve_data_root(user_provided)
+    return root / "library" if root else None
+
+def get_configured_library_dir(user_provided=None):
+    """Points to {root}/library/configured/"""
+    lib = get_library_dir(user_provided)
+    return lib / "configured" if lib else None
+
+def get_customized_library_dir(user_provided=None):
+    """Points to {root}/library/customized/"""
+    lib = get_library_dir(user_provided)
+    return lib / "customized" if lib else None
+
 def get_in_dir(user_provided=None):
     """
     Returns the Path to the raw input data (drivers, etc.).
-    Points to {data_root}/input_data/
+    Points to {data_root}/library/input_data/
     Enforces a strict check to ensure the library is present.
     """
-    # 1. Resolve the base data directory (saved setting or user arg)
-    root = resolve_data_root(user_provided)
+    """Points to {root}/library/input_data/ (The raw sources)"""
+    lib = get_library_dir(user_provided)
     
     # 2. Point to the input_data subfolder
-    path = root / "input_data"
+    path = lib / "input_data"
 
     # 3. STRICT CHECK: Ensure the library is present before proceeding
     if not path.exists():
@@ -119,32 +134,80 @@ def get_in_dir(user_provided=None):
     
     return path.resolve()
 
+# --- SANDBOX (The Work) ---
+
+def create_project(project_name):
+    """
+    Automates the creation of a research sandbox.
+    Creates folder and copies standard templates for Customized mode.
+    """
+    # 1. Resolve Path
+    from .paths import get_projects_dir, get_library_dir
+    base = get_projects_dir()
+    p_path = base / project_name
+    
+    # 2. Safety Check
+    if p_path.exists():
+        print(f"\n[OSCAR] Folder '{project_name}' already exists. No changes made.")
+        return p_path
+
+    # 3. Create structure
+    print(f"\n[OSCAR] Initializing project: {project_name}")
+    p_path.mkdir(parents=True, exist_ok=True)
+    (p_path / "results").mkdir(exist_ok=True)
+
+    # 4. Copy Templates
+    lib_tpl = get_library_dir() / "customized" / "templates"
+    if lib_tpl.exists():
+        # Copy settings file with correct project suffix
+        shutil.copy(lib_tpl / "settings_template.yaml", 
+                    p_path / f"settings_{project_name}.yaml")
+        print(f"[OSCAR] Setup complete! You can now edit your files in: {p_path}")
+    else:
+        print("[OSCAR] Warning: Library templates not found. Manual setup required.")
+    
+    return p_path
+
+def get_projects_dir(user_provided=None):
+    """Points to {root}/projects/ where user-defined research lives."""
+    root = resolve_data_root(user_provided)
+    return root / "projects" if root else None
+
+def resolve_project_path(project_name):
+    """
+    Finds the SPECIFIC folder for a study by name.
+    Location: {data_root}/projects/{project_name}
+    """
+    if project_name is None:
+        return None
+        
+    base = get_projects_dir()
+    if base:
+        path = base / project_name
+        # We don't auto-create here; we let the workflow handle 
+        # validation (check if settings.yaml exists)
+        return path
+        
+    return None
+
+# --- ARCHIVE (The Output) ---
+
 def get_bootstrap_dir():
     """Returns the internal path for 'standard' mode bootstrap files."""
     return INTERNAL_BOOTSTRAP_DIR.resolve()
 
 def get_out_dir(user_provided=None):
     """
-    Determines where model results should be saved.
-    Logic: User Argument > User Data Subfolder > Package Root Default.
+    Priority: 1. Argument | 2. UserRoot/results | 3. PackageRoot/data/results
     """
     if user_provided:
         path = Path(user_provided)
     else:
-        # Check if a persistent data directory is set
-        user_data_root = get_user_data_dir()
-        if user_data_root:
-            # Save results in the large data drive
-            path = user_data_root / "results"
-        else:
-            # Default fallback to the project root
-            print("\n[OSCAR] No data directory configured. Using default results path.\n") # this is likely never used
-            path = PACKAGE_ROOT / "data" / "results"
+        user_root = get_user_data_dir()
+        path = user_root / "results" if user_root else PACKAGE_ROOT / "data" / "results"
 
     path = path.expanduser().resolve()
     path.mkdir(parents=True, exist_ok=True)
     return path
 
-def get_configured_dir(data_dir=None):
-    """Entry point for all files used in configured mode."""
-    return resolve_data_root(data_dir) / "library" / "configured"
+
