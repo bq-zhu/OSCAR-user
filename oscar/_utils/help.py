@@ -61,7 +61,7 @@ def _print_standard(cfg_full):
     print("="*width + "\n")
 
 def _print_configured(cfg_full):
-    """Displays official scientific library options (Tier 1)."""
+    """Displays official scientific library options."""
     cfg = cfg_full['configured_mode']
     width = 95
     print("\n" + "="*width)
@@ -69,7 +69,7 @@ def _print_configured(cfg_full):
     print("="*width)
     print("Official scientific experiments using curated forcing and parameter libraries.")
     
-    print("\nAvailable Options (Validated Tier 1):")
+    print("\nAvailable Options :")
     print(f"  {'Histories':<12} : {', '.join(cfg['allowed_hist'])}")
     print(f"  {'Regions':<12} : {', '.join(cfg['allowed_regions'])}")
     print(f"  {'Scenarios':<12} : {', '.join(cfg['allowed_scenarios'])}")
@@ -139,11 +139,13 @@ def _print_customized(cfg_full):
 
     print("\n[ SETTINGS / WORKFLOW ]")
     for key, val in cfg['settings'].items():
-        print(f"  {key:<20}: {val}")
+        print(f"  {key:<20}: {val}/False")
 
     print("\n[ USAGE ]")
-    print("  1. Create Project Folder : oscar.create_project('my_project')")
-    print("  2. Run Simulation        : oscar.run(mode='customized', project='my_project')")
+    print("  0. Download Templates : oscar.download(mode='customized'))")
+    print("  1. Create Project Folder : oscar.create_project('my-project')")
+    print("  2. Create setting file : copy settings_template.yaml to my-project/settings_my-experiment.yaml and edit the settings as needed.")
+    print("  3. Run Simulation        : oscar.run(mode='customized', project='my-project', experiment='my-experiment')")
     print("="*width + "\n")
 
 def _print_advanced():

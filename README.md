@@ -31,31 +31,21 @@ oscar run
 
 ---
 
-## 🔍 Discovery & Help
+## 🔎 Discovery, Help & Run Modes
 
-OSCAR is self-documenting. You can explore available scientific configurations, regional aggregations, and variable lists directly from your terminal or Python session.
+OSCAR is self-documenting and supports multiple run levels.  
+You can both **inspect** a mode and **execute** it from the Terminal or Python.
 
-| To see this info... | Terminal Command | Python Command | Status |
-| :--- | :--- | :--- | :--- |
-| **General Overview** | `oscar` | `oscar.info()` | Available |
-| **Standard Mode Specs** | `oscar info standard` | `oscar.info('standard')` | Available |
-| **Official Scenario Library** | `oscar info configured` | `oscar.info('configured')` | Available |
-| **Customized / Advanced** | — | — | *In Development* |
+| Mode | Purpose | Inspect (Terminal) | Inspect (Python) | Run (Terminal) | Run (Python) | Status |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| **General** | Package overview & guidance | `oscar` | `oscar.info()` | — | — | ✅ Available |
+| **Standard** | Instant verification simulation | `oscar info standard` | `oscar.info("standard")` | `oscar run` | `oscar.run()` | ✅ Available |
+| **Configured** | Official scenario library runs | `oscar info configured` | `oscar.info("configured")` | `oscar run -m configured` | `oscar.run(mode="configured")` | ✅ Available |
+| **Customized** | User-defined research workflows | — | `oscar.info("customized")` | — | `oscar.run(mode="customized")` | 🚧 In Development |
+| **Advanced** | Core model development | — | — | — | `oscar.run(mode="advanced")` | 🚧 In Development |
 
----
-
-## 📊 Run Modes
-
-OSCAR provides four tiers of interaction. Control the model via the **Terminal** (standard workflows) or **Python** (custom research).
-
-| Mode | Purpose | Terminal Command | Python Command | Availability |
-| :--- | :--- | :--- | :--- | :--- |
-| **Standard** | Instant verification | `oscar run` | `oscar.run()` | **Now** |
-| **Configured**| Official library runs | `oscar run -m configured` | `oscar.run(mode='configured')`| **Now** |
-| **Customized**| User research | *(Not available)* | `oscar.run(mode='customized')`| *In Dev* |
-| **Advanced** | Model development | *(Not available)* | `oscar.run(mode='advanced')` | *In Dev* |
-
-> **Note:** Scientific modes (Configured and above) require access to a large data library. The model will automatically guide you through a one-time directory initialization upon your first request.
+> **Note:** Scientific modes (Configured and above) require access to a large data library.  
+> The model will guide you through a one-time directory initialization on first use.
 
 ---
 
@@ -79,6 +69,29 @@ oscar.run(
     region="RCP_5reg"
 )
 ```
+### Python (Customized Mode)
+Run user defined scenarios
+
+**Preparation:** 
+
+0. Download Templates: Look for setting_template.yaml
+
+1. Create Project Folder : oscar.create_project('my-project')
+    - (optional) put user forcing in this project folder (if empty, model will run with baseline scenarios)
+    - create a setting_my-experiment.yaml, customize this setting file
+
+2. Run Simulation with: 
+```python
+import oscar
+
+# Run user-defined scenarios
+oscar.run(
+    mode="customized", 
+    project='my-project', 
+    experiment='my-experiment'
+)
+```
+**Note:** run oscar.info('customized') for detailed information.
 
 ---
 

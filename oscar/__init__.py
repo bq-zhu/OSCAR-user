@@ -2,7 +2,7 @@
 from importlib.metadata import version, PackageNotFoundError
 
 # 1. Core Functions
-from .run import run, info
+from .run import run, info, download
 from ._io.paths import set_data_dir, get_user_data_dir, create_project
 
 # 2. Version Management

@@ -11,7 +11,7 @@ import xarray as xr
 # 1. Ensure the script can find the local 'oscar' package
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
 
-def run_verification():
+def test_smoke():
     print("--- OSCAR SMOKE TEST START ---")
     
     try:

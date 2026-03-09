@@ -66,7 +66,7 @@ def build_example_data():
     df_atm_final = pd.concat(all_atm_rows, ignore_index=True)
     df_atm_final = df_atm_final[df_atm_final['value'] != 0].copy()
     
-    atm_fname = "forcing_atmospheric_Global_1reg_example.csv"
+    atm_fname = "forcing_atmospheric_RCP_5reg_oscar-csv_example.csv"
     df_atm_final.to_csv(example_dir / atm_fname, index=False)
     print(f"    [CSV] Created {atm_fname}")
 
@@ -85,7 +85,7 @@ def build_example_data():
         cols = ['scen', 'year', 'reg_land', 'variable', 'bio_from', 'bio_to', 'value']
         df_lu = df_lu[cols]
         
-        lu_fname = "lulcc_RCP_5reg_example.csv"
+        lu_fname = "lulcc_RCP_5reg_oscar-csv_example.csv"
         df_lu.to_csv(example_dir / lu_fname, index=False)
         print(f"    [CSV] Created {lu_fname}")
 

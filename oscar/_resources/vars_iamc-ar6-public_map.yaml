@@ -12,14 +12,14 @@ emissions:
   "Emissions|CO2|Energy and Industrial Processes": ["Eff", "Eff", "(12.011 / 44.009) / 1000", "Mt CO2/yr"]
   "Emissions|CO2|AFOLU": ["Eluc", "Eluc", "(12.011 / 44.009) / 1000", "Mt CO2/yr"]
   "Emissions|CH4": ["E_CH4", "E_CH4", "12.011 / 16.043", "Mt CH4/yr"]
-  "Emissions|N2O": ["E_N2O", "E_N2O", "28.014 / 44.013", "kt N2O/yr"]
+  "Emissions|N2O": ["E_N2O", "E_N2O", "(28.014 / 44.013) / 1000", "kt N2O/yr"]
   "Emissions|NOx": ["E_NOX", "E_NOX", "14.007 / 46.005", "Mt NO2/yr"]
   "Emissions|Sulfur": ["E_SO2", "E_SO2", "32.06 / 64.06", "Mt SO2/yr"]
   "Emissions|NH3": ["E_NH3", "E_NH3", "14.007 / 17.031", "Mt NH3/yr"]
   "Emissions|VOC": ["E_VOC", "E_VOC", "1.0", "Mt VOC/yr"]
   "Emissions|BC": ["E_BC", "E_BC", "1.0", "Mt BC/yr"] # Note: need to set internal biomass burning emissions to 0 for this to be correct for v3. Or setting ABB to zero in the input file.
   "Emissions|OC": ["E_OC", "E_OC", "1.0", "Mt OC/yr"]
-  "Emissions|CO": ["E_CO", "E_CO", "1.0", "Mt CO/yr"]
+  "Emissions|CO": ["E_CO", "E_CO", "12.011/(12.011+15.999)", "Mt CO/yr"]
 
   # Halogens (OSCAR_VAR is E_Xhalo, OSCAR_ID is the specific compound)
   # Multiplier 1000.0 used because IAMC (kt) -> OSCAR (Gg) is 1:1

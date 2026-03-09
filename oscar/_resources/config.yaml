@@ -4,8 +4,8 @@
 metadata:
   zenodo_base_url: "https://zenodo.org/api/records/"
   input_data: { version: "2026.inp.rc1", zenodo_id: "18406812" }
-  configured: { version: "2026.con.rc2", zenodo_id: "18406911" }
-  customized: { version: "2026.cus.rc1", zenodo_id: "" }
+  configured: { version: "2026.con.rc2", zenodo_id: "18786604" }
+  customized: { version: "2026.cus.rc1", zenodo_id: "18897003" }
   
   # Library Horizons
   build_end: &default_end 2100  # Official library ceiling
@@ -71,7 +71,7 @@ customized_mode:
   allowed_years: { min: 1750, max: *max_end }
   allowed_regions: *regions
   allowed_baselines: *scens
-  marker_scenarios: ['SSP1-2.6', 'SSP2-4.5', 'SSP5-8.5']
+  marker_scenarios: ['SSP1-2.6', 'SSP2-4.5']
   
   output_themes:
     climate: *v_core
@@ -81,7 +81,7 @@ customized_mode:
     custom: null
 
   settings:
-    run_model: true
+    preprocess_forcing: true
     plot_user_forcing: true
+    run_model: true
     plot_outputs: true
-    save_forcing_nc: true
