@@ -142,9 +142,9 @@ def _print_customized(cfg_full):
         print(f"  {key:<20}: {val}/False")
 
     print("\n[ USAGE ]")
-    print("  0. Download Templates : oscar.download(mode='customized'))")
+    print("  0. Download Templates : oscar.download(mode='customized')")
     print("  1. Create Project Folder : oscar.create_project('my-project')")
-    print("  2. Create setting file : copy settings_template.yaml to my-project/settings_my-experiment.yaml and edit the settings as needed.")
+    print("  2. Edit setting file in the created folder (e.g., settings_my-experiment.yaml)")
     print("  3. Run Simulation        : oscar.run(mode='customized', project='my-project', experiment='my-experiment')")
     print("="*width + "\n")
 

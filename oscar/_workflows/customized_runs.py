@@ -143,6 +143,10 @@ def run_customized(project=None, experiment=None, **kwargs):
             
             # Join historical anchor (2014) + projection (2015+)
             anchor_entry = f_anchor.expand_dims(year=[h_end])
+            
+            # Reindex the anchor to match the species in the merged data
+            anchor_entry = anchor_entry.reindex_like(merged.isel(year=0), method=None, fill_value=0)
+
             full = xr.concat([anchor_entry, merged], dim='year').interp(year=np.arange(h_end, end_yr + 1))
             
             # Re-attach the scenario label before adding to the list
@@ -159,7 +163,7 @@ def run_customized(project=None, experiment=None, **kwargs):
         # 5. Drop concentration-driven variables to avoid confusion (since user inputs are in emissions)
         # These vars are D_CO2, D_CH4, D_N2O, D_Xhalo
         # Note: it is hard-coded that this mode cannot be driven by concentration scenarios
-        for_final = for_final.drop([var for var in for_final if var in ['D_CO2', 'D_CH4', 'D_N2O', 'D_Xhalo']])
+        for_final = for_final.drop_vars([var for var in for_final if var in ['D_CO2', 'D_CH4', 'D_N2O', 'D_Xhalo']])
         #print(for_final.Eff.isel(scen=1)-for_final.Eff.isel(scen=12))
         if p_forcing_file.exists(): 
             p_forcing_file.unlink()

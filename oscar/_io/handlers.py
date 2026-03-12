@@ -8,8 +8,6 @@ import numpy as np
 import re
 import yaml
 from .paths import PACKAGE_ROOT
-from .._core.fct_loadP import load_all_param
-from .._core.fct_misc import aggreg_region
 
 # --- SHARED UTILS ---
 
@@ -198,10 +196,9 @@ def _load_allowed_regions(mod_region):
     Retrieves the official list of region names for a specific resolution.
     Preserves the 0, 1, 2... order from the CSV rows.
     """
-    from .paths import get_in_dir
     import csv
     
-    reg_meta_path = get_in_dir() / "regions" / "regions_long_name.csv"
+    reg_meta_path =  PACKAGE_ROOT / "oscar" / "_resources" / "regions_long_name.csv"
     with open(reg_meta_path, "r") as f:
         reader = csv.reader(f)
         header = next(reader)

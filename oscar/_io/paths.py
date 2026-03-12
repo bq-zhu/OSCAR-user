@@ -161,7 +161,7 @@ def create_project(project_name):
     if lib_tpl.exists():
         # Copy settings file with correct project suffix
         shutil.copy(lib_tpl / "settings_template.yaml", 
-                    p_path / f"settings_{project_name}.yaml")
+                    p_path / f"settings_my-experiment.yaml")
         print(f"[OSCAR] Setup complete! You can now edit your files in: {p_path}")
     else:
         print("[OSCAR] Warning: Library templates not found. Manual setup required.")

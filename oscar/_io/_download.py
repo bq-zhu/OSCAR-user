@@ -21,10 +21,9 @@ def ensure_configured_library(hist_type, region):
 
     # 2. If not found, prepare for download
     full_cfg = load_config()
-    paths = full_cfg['paths']
     record_id = full_cfg['metadata']['configured']['zenodo_id']
     zip_filename = f"OSCAR_configured_{hist_type}_{region}.zip"
-    url = f"{paths['zenodo_base_url']}{record_id}/files/{zip_filename}/content"
+    url = f"{full_cfg['metadata']['zenodo_base_url']}{record_id}/files/{zip_filename}/content"
     
     # Path to temporarily store the zip during download
     # (Put it one level up in the CMIP6 folder)
@@ -73,14 +72,13 @@ def ensure_customized_library():
     and extracts it into {data_root}/library/customized/.
     """
     target_dir = get_customized_library_dir()
-
     if target_dir is None:
         raise ValueError(
             "No user data directory configured. "
             "Please run oscar.set_data_dir('/your/path') first."
         )
-
-    marker_file = target_dir / "forcing_hist.nc"
+    
+    marker_file = target_dir / "templates" / "settings_template.yaml"
     if marker_file.exists():
         return target_dir
 
@@ -123,8 +121,8 @@ def ensure_customized_library():
                 f"Zenodo record {record_id}."
             )
 
-        target_dir.parent.mkdir(parents=True, exist_ok=True)
-        zip_temp_path = target_dir.parent / zip_name
+        target_dir.mkdir(parents=True, exist_ok=True)
+        zip_temp_path = target_dir / zip_name
 
         response = requests.get(zip_url, stream=True, timeout=120)
         response.raise_for_status()
@@ -135,7 +133,7 @@ def ensure_customized_library():
 
         print(f"[OSCAR] Extracting: {zip_name}")
         with zipfile.ZipFile(zip_temp_path, 'r') as zip_ref:
-            zip_ref.extractall(target_dir.parent)
+            zip_ref.extractall(target_dir)
 
         if not marker_file.exists():
             raise RuntimeError(
