@@ -78,7 +78,7 @@ Run user defined scenarios
 
 1. Create Project Folder : oscar.create_project('my-project')
     - (optional) put user forcing in this project folder (if empty, model will run with baseline scenarios)
-    - create a setting_my-experiment.yaml, customize this setting file
+    - modify the setting file: setting_my-experiment.yaml
 
 2. Run Simulation with: 
 ```python
