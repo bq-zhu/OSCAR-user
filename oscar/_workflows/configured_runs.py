@@ -4,52 +4,45 @@ Scientific projections using official pre-compiled CMIP libraries.
 """
 import xarray as xr
 from .._utils.load_config import load_config
-from .._io.paths import get_configured_dir, get_out_dir
+from .._io.paths import get_configured_library_dir, get_out_dir
 from .._io._download import ensure_configured_library
 from .._core.mod_process import OSCAR
 from .._utils.metadata import apply_variable_metadata
 
 def run_configured(
     scenario=None,  # user-selected scenario(s)
-    region=None,    # user-selected region aggregation (at which level OSCAR runs)
+    region=None,    # user-selected region
     hist_type=None, # user-selected historical dataset
     variables=None, # user-selected output variables
-    show_plot=True, # whether to display summary plots
-    run_model=True, # whether to run the model (set False to only plot)
+    show_plot=True, 
+    run_model=True, 
     **kwargs
 ):
-    """
-    Scientific projections using official OSCAR library.
-
-    -------------------------------------------------------------------------
-    DATA REQUIREMENTS:
-    This mode expects a structured library in your specified data directory:
-    - {data_root}/configured/{hist_type}/{region}/params_nMC500.nc
-    - {data_root}/configured/{hist_type}/{region}/forcing_scen.nc
-    - {data_root}/configured/{hist_type}/{region}/hist_results_nMC500.nc
-    - {data_root}/configured/{hist_type}/{region}/ini_state_nMC500.nc
-    -------------------------------------------------------------------------
-    """
-    # 1. LOAD CONFIGURATION SPECIFICATIONS
-    full_cfg = load_config()
-    menu = full_cfg['configured_options']
-    defaults = menu['defaults']
+    # 1. LOAD CONFIGURATION (Source of Truth)
+    cfg_full = load_config()
+    registry = cfg_full['registry']
+    cfg_mode = cfg_full['configured_mode']
+    defaults = cfg_mode['defaults']
     
     # 2. RESOLVE FINAL SELECTIONS
+    # Pull from user input OR Configured Mode defaults
     hist_final   = hist_type or defaults['hist_type']
     region_final = region    or defaults['region']
     
     scen_input   = scenario or defaults['scenario']
     scen_final   = [scen_input] if isinstance(scen_input, str) else list(scen_input)
     
-    vars_input   = variables or defaults['variables']
+    # Map 'var_select' from defaults to match function signature 'variables'
+    vars_input   = variables or defaults.get('var_select', defaults.get('variables'))
     vars_final   = [vars_input] if isinstance(vars_input, str) else list(vars_input)
 
-    hist_end_year   = menu['hist_list'][hist_final]
-    scen_start_year = hist_end_year + 1
-    scen_end_year   = menu['projection_end_year']
+    # Resolve Scientific Years from Registry
+    hist_specs      = registry['hist_versions'][hist_final]
+    hist_end_year   = hist_specs['hist_end']
+    scen_start_year = hist_specs['scen_start']
+    scen_end_year   = cfg_mode['run_end'] # Official build ceiling (2100)
     
-    nMC = menu['official_nMC']
+    n_mc = cfg_mode['official_nMC']
 
     # Setup Output Path
     out_dir = get_out_dir() / "configured_run"
@@ -57,58 +50,94 @@ def run_configured(
     out_file = out_dir / f"oscar_configured_{hist_final}_{region_final}.nc"
 
     if run_model:
-        # 3. VALIDATION
-        _validate_choice(hist_final, menu['hist_list'].keys(), "hist_type")
-        _validate_choice(region_final, menu['region_list'], "region")
+        # 3. VALIDATION (Check against allowed lists in configured_mode)
+        _validate_choice(hist_final, cfg_mode['allowed_hist'], "hist_type")
+        _validate_choice(region_final, cfg_mode['allowed_regions'], "region")
         for s in scen_final:
-            _validate_choice(s, menu['scen_list'], "scenario")
+            _validate_choice(s, cfg_mode['allowed_scenarios'], "scenario")
         for v in vars_final:
-            _validate_choice(v, menu['var_list'], "variable")
+            _validate_choice(v, cfg_mode['allowed_variables'], "variable")
 
         # 4. LOAD LIBRARY COMPONENTS
-        print(f"Loading official library for {region_final} ({nMC} members)...")
+        print(f"Loading official library for {region_final} ({n_mc} members)...")
+        # ensure_configured_library handles pathing and Zenodo downloads
         lib_path = ensure_configured_library(hist_final, region_final)
         
-        # Load time-series results (for plotting) and the frozen state (for simulation)
-        hist_results = xr.open_dataset(lib_path / f"hist_results_nMC{nMC}.nc").load()
-        ini_state    = xr.open_dataset(lib_path / f"ini_state_nMC{nMC}.nc").load()
+        # Load pre-built components (Using NetCDF4/HDF5)
+        hist_results = xr.open_dataset(lib_path / f"hist_results_nMC{n_mc}.nc").load()
+        ini_state    = xr.open_dataset(lib_path / f"ini_state_nMC{n_mc}.nc").load()
         scen_forcing = xr.open_dataset(lib_path / "forcing_scen.nc").load()
-        params       = xr.open_dataset(lib_path / f"params_nMC{nMC}.nc").load()
+        params       = xr.open_dataset(lib_path / f"params_nMC{n_mc}.nc").load()
 
-        # 5. ENSURE COMPLETE LIBRARY
-        lib_path = ensure_configured_library(hist_final, region_final)
-        print(f"Library components loaded successfully, in : {lib_path}")
+        print(f"Library components loaded from: {lib_path}")
         
-        # 6. PREPARE INPUTS
-        For_scen = scen_forcing.sel(scen=scen_final, year=slice(scen_start_year, scen_end_year))
-        # Use the specialized ini_state file which contains all required restart variables
-        Ini = ini_state
+        # 5. PREPARE INPUTS
+        For_scen = scen_forcing.sel(
+            scen=scen_final, 
+            year=slice(scen_start_year, scen_end_year)
+        )
         
-        # 7. EXECUTE PROJECTION
+        # 6. EXECUTE PROJECTION
         print(f"Running OSCAR (configured mode) for scenarios: {scen_final}")
-        Out_scen = OSCAR(Ini=Ini, Par=params, For=For_scen, nt=4, var_keep=vars_final, **kwargs) #always specify vars_final to make sure rquested variables are saved
+        # nt=4 for parallel processing
+        Out_scen = OSCAR(
+            Ini=ini_state, 
+            Par=params, 
+            For=For_scen, 
+            nt=4, 
+            var_keep=vars_final, 
+            **kwargs
+        )
         
-        # 8. COMBINE & APPLY METADATA
-        print("Cleaning results and applying metadata...")
+        # 7. COMBINE & APPLY METADATA
+        print("Concatenating with history and applying metadata...")
+        # Slice historical results to only include user-requested variables
         Out_all = xr.concat([hist_results[vars_final], Out_scen[vars_final]], dim='year')
         Out_all = apply_variable_metadata(Out_all)
 
-        # 9. SAVE
-        Out_all.to_netcdf(out_file, format="NETCDF3_64BIT")
+        # 8. SAVE
+        Out_all.to_netcdf(out_file, engine="h5netcdf")
         print(f"Success! Data saved to: {out_file}")
     
     else:
         # --- PLOT ONLY MODE ---
         if not out_file.exists():
-            raise FileNotFoundError(f"No results found. Run with run_model=True first.")
+            raise FileNotFoundError(f"No results found for {hist_final}/{region_final}. Set run_model=True.")
         Out_all = xr.open_dataset(out_file).load()
 
-    # 10. PLOT SUMMARY
+    # 9. PLOT SUMMARY
     from .._viz import plot_timeseries_summary
-    plot_timeseries_summary(Out_all, hist_end_year, vars_final, out_dir=out_dir, show_plot=show_plot)
+    plot_timeseries_summary(
+        Out_all, 
+        hist_end_year, 
+        vars_final, 
+        out_dir=out_dir, 
+        show_plot=show_plot
+    )
     
     return Out_all
 
 def _validate_choice(value, allowed_list, name):
-    if value not in allowed_list:
-        raise ValueError(f"Invalid {name}: '{value}'. Available: {list(allowed_list)}")
+    """
+    Validates a user choice against a list that may contain nested 
+    lists from YAML anchors.
+    """
+    # 1. Internal flattener to handle nested lists from YAML
+    def flatten(nested):
+        flat = []
+        for item in nested:
+            if isinstance(item, list):
+                flat.extend(flatten(item))
+            else:
+                flat.append(item)
+        return flat
+
+    # 2. Get the clean, flat list of allowed options
+    flat_allowed = flatten(allowed_list)
+
+    # 3. Perform the check
+    if value not in flat_allowed:
+        raise ValueError(
+            f"Invalid {name}: '{value}'. "
+            f"Currently supported in this version: {flat_allowed}"
+        )

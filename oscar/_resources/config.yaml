@@ -1,62 +1,87 @@
-# OSCAR Configuration Settings
-# This file defines the 'Source of Truth' for Default and Standard runs.
-
-# Data version tracking for all model modes
+# ==========================================================
+# 1. DATA & TIME REGISTRY
+# ==========================================================
 metadata:
-  input_data:
-    version: "2026.inp.rc1"
-    zenodo_id: "18406812"    # This record has the raw input file.
-
-  configured:
-    version: "2026.con.rc1"
-    zenodo_id: "18406911"    # This record has the configured libraries.
-    
-  customized:
-    version: "2026.cus.rc1"
-    zenodo_id: ""    # This record has templates and background drivers.
-
-paths:
   zenodo_base_url: "https://zenodo.org/api/records/"
+  input_data: { version: "2026.inp.rc1", zenodo_id: "18406812" }
+  configured: { version: "2026.con.rc2", zenodo_id: "18786604" }
+  customized: { version: "2026.cus.rc1", zenodo_id: "18897003" }
+  
+  # Library Horizons
+  build_end: &default_end 2100  # Official library ceiling
+  ext_end:   &max_end     2100  # Research extension ceiling - To be extended to 2300
 
+required_assets:
+  - "forcing_hist.nc"
+  - "forcing_scen.nc"
+  - "params_nMC{nMC}.nc"
+  - "hist_results_nMC{nMC}.nc"
+  - "ini_state_nMC{nMC}.nc"
 
-# STANDARD MODE RUN SETTINGS
-bootstrap_specs:
-  region: "RCP_5reg"
+# ==========================================================
+# 2. SCIENTIFIC REGISTRY
+# ==========================================================
+registry:
+  # Historical versions define the "Scientific Switch" year
+  hist_versions:
+    CMIP6: { hist_end: 2014, scen_start: 2015 }
+    #CMIP7: { hist_end: 2020, scen_start: 2021 } # Placeholder for future CMIP7 data
+
+  # Variable Tiers
+  v_core: &v_core ['D_Tg', 'D_CO2', 'D_CH4', 'D_N2O']
+  v_official: &v_off ['D_Focean', 'D_Fland', 'D_OHC', 'D_Eluc']
+  v_research: &v_res ['D_cveg', 'D_csoil1', 'D_csoil2', 'D_pthaw', 'D_Cfroz', 'D_Cthaw']
+
+  # Spatial & Scenario Bounds
+  all_regions: &regions ["RCP_5reg", "RCP_10reg", "AR6_5reg", "AR6_10reg", "AR6_22reg"]
+  all_scenarios: &scens ['SSP1-1.9', 'SSP1-2.6', 'SSP2-4.5', 'SSP3-7.0', 'SSP3-7.0-LowNTCF', 'SSP4-3.4', 'SSP4-6.0', 'SSP5-3.4-OS', 'SSP5-8.5']
+
+# ==========================================================
+# 3. OPERATION TIERS
+# ==========================================================
+
+# TIER 0: STANDARD (Verification)
+# Automated "Baseline" run
+standard_mode:
   nMC: 50
-  hist_start_year: 1750
-  hist_end_year: 2014
-  scen_start_year: 2015
-  scen_end_year: 2100
-  scen_full: ['SSP1-1.9', 'SSP1-2.6', 'SSP2-4.5', 'SSP3-7.0', 'SSP3-7.0-LowNTCF', 'SSP4-3.4', 'SSP4-6.0', 'SSP5-3.4-OS', 'SSP5-8.5']
-  var_full : ['D_Xhalo_lag', 'D_Cfroz', 'D_Tg', 'D_Td', 'D_Csoil1_bk', 'D_N2O_lag', 'D_Csoil2_bk', 'D_OHC', 'D_Xhalo', 'D_CH4', 'D_N2O', 'D_CO2', 'D_cveg', 'D_Chwp', 'D_CH4_lag', 'D_Aland', 'D_csoil2', 'D_Cveg_bk', 'D_pthaw', 'D_Cthaw', 'D_csoil1', 'D_Cosurf', 'D_Pg']
-  var_select : ['D_Tg', 'D_CO2', 'D_CH4', 'D_N2O']
+  hist_type: "CMIP6"
+  # Run covers the full library range
+  run_range: [1750, *default_end]
+  region: "RCP_5reg"
+  scenarios: *scens
+  var_select: *v_core
 
-# Configured MODE RUN SETTINGS
-configured_options:
-  # 1. The Menu
-  hist_list: 
-    CMIP6: 2014
-    # CMIP7: 2020  <-- Uncomment this once CMIP7 drivers are verified
-  region_list: ["RCP_5reg", "RCP_10reg", "AR6_5reg", "AR6_10reg", "AR6_22reg"]
-  scen_list: ['SSP1-1.9', 'SSP1-2.6', 'SSP2-4.5', 'SSP3-7.0', 'SSP3-7.0-LowNTCF', 'SSP4-3.4', 'SSP4-6.0', 'SSP5-3.4-OS', 'SSP5-8.5']
-  # Simplified var_full for Version 1 -- Focus: Global Temperature, Greenhouse Gas Concentrations, and Major Carbon Fluxes
-  var_list: [
-    'D_Tg',      # Global surface temperature change
-    'D_CO2',     # Atmospheric CO2 concentration change
-    'D_CH4',     # Atmospheric CH4 concentration change
-    'D_N2O',     # Atmospheric N2O concentration change
-    'D_Focean',  # Net ocean carbon flux change
-    'D_Fland',   # Net land carbon flux change
-    'D_OHC',     # Ocean heat content change
-    'D_Eluc'     # CO2 emissions from land-use change
-  ]
-
-  projection_end_year: 2100
+# TIER 1: CONFIGURED (Library Builder)
+configured_mode:
   official_nMC: 500
-
-  # 2. Default starting points
+  run_end: *default_end
+  allowed_hist: ["CMIP6"] #TODO: Add CMIP7 when available
+  allowed_regions: *regions
+  allowed_scenarios: *scens
+  allowed_variables: [*v_core, *v_off]
   defaults:
     hist_type: "CMIP6"
     region: "RCP_5reg"
     scenario: ["SSP2-4.5"]
-    variables: ["D_Tg", "D_CO2"]
+    var_select: ["D_Tg", "D_CO2"]
+
+# TIER 2: CUSTOMIZED (User Research)
+customized_mode:
+  allowed_hist: ["CMIP6"] # TODO: Add CMIP7 when available
+  allowed_years: { min: 1750, max: *max_end }
+  allowed_regions: *regions
+  allowed_baselines: *scens
+  marker_scenarios: ['SSP1-2.6', 'SSP2-4.5']
+  
+  output_themes:
+    climate: *v_core
+    land: ["D_CO2", "D_Fland", "D_Eluc", "D_cveg", "D_csoil1", "D_csoil2"]
+    permafrost: ["D_Tg", "D_pthaw", "D_Cfroz", "D_Cthaw"]
+    comprehensive: [*v_core, *v_off, *v_res]
+    custom: null
+
+  settings:
+    preprocess_forcing: true
+    plot_user_forcing: true
+    run_model: true
+    plot_outputs: true

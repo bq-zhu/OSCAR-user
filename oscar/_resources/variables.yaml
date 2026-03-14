@@ -12,50 +12,42 @@
 #    swap this file for a 'cmip7_standard.yaml' without touching the physics.
 # 3. Maintainability: Non-Python experts can update variable descriptions 
 #    without risking bugs in the numerical solver.
+# 
+# Format: code_name: {sci_name: "Symbol", long_name: "Full Name", unit: "Unit"}
 # ==============================================================================
 
 variables:
   # --- CLIMATE INDICATORS ---
-  D_Tg:
-    sci_name: "ΔTg"
-    long_name: "Global surface temperature change"
-    unit: "K"
-    
-  D_OHC:
-    sci_name: "ΔOHC"
-    long_name: "Ocean heat content change"
-    unit: "ZJ"
+  D_Tg: {sci_name: "ΔTg", long_name: "Global surface temperature change", unit: "K"}
+  D_OHC: {sci_name: "ΔOHC", long_name: "Ocean heat content change", unit: "ZJ"}
+  D_Td: {sci_name: "ΔTd", long_name: "Deep ocean temperature change", unit: "K"}
+  D_Pg: {sci_name: "ΔPg", long_name: "Global precipitation change", unit: "mm yr-1"}
 
   # --- CONCENTRATIONS ---
-  D_CO2:
-    sci_name: "ΔCO2"
-    long_name: "Atmospheric CO2 concentration change"
-    unit: "PgC yr-1"
-
-  D_CH4:
-    sci_name: "ΔCH4"
-    long_name: "Atmospheric CH4 concentration change"
-    unit: "ppb"
-
-  D_N2O:
-    sci_name: "ΔN2O"
-    long_name: "Atmospheric N2O concentration change"
-    unit: "ppb"
+  D_CO2: {sci_name: "ΔCO2", long_name: "Atmospheric CO2 concentration change", unit: "ppm"}
+  D_CH4: {sci_name: "ΔCH4", long_name: "Atmospheric CH4 concentration change", unit: "ppb"}
+  D_N2O: {sci_name: "ΔN2O", long_name: "Atmospheric N2O concentration change", unit: "ppb"}
+  D_Xhalo: {sci_name: "ΔXhalo", long_name: "Halogenated species concentration change", unit: "ppt"}
 
   # --- CARBON FLUXES ---
-  D_Focean:
-    sci_name: "ΔFn-ocean"
-    long_name: "Net ocean carbon flux change"
-    unit: "PgC yr-1"
+  D_Focean: {sci_name: "ΔFn-ocean", long_name: "Net ocean carbon sink", unit: "PgC yr-1"}
+  D_Fland: {sci_name: "ΔFn-land", long_name: "Net land carbon sink", unit: "PgC yr-1"}
+  D_Eluc: {sci_name: "Eluc", long_name: "CO2 emissions from land-use change", unit: "PgC yr-1"}
 
-  D_Fland:
-    sci_name: "Fn-land"
-    long_name: "Net land carbon flux change"
-    unit: "PgC yr-1"
+  # --- LAND BIOGEOCHEMISTRY ---
+  D_cveg: {sci_name: "ΔCveg", long_name: "Vegetation carbon stock change", unit: "PgC Mha-1"}
+  D_csoil1: {sci_name: "ΔCsoil1", long_name: "Litter carbon stock change", unit: "PgC Mha-1"}
+  D_csoil2: {sci_name: "ΔCsoil2", long_name: "Soil carbon stock change", unit: "PgC Mha-1"}
+  D_nbp: {sci_name: "ΔNBP", long_name: "Net biome productivity change", unit: "PgC yr-1 Mha-1"}
 
-  D_Eluc:
-    sci_name: "Eluc"
-    long_name: "CO2 emissions from land-use change"
-    unit: "PgC yr-1"
+  # --- PERMAFROST ---
+  D_pthaw: {sci_name: "Δpthaw", long_name: "Permafrost thawed fraction change", unit: "1"}
+  D_Cfroz: {sci_name: "ΔCfroz", long_name: "Frozen permafrost carbon change", unit: "PgC"}
+  D_Cthaw: {sci_name: "ΔCthaw", long_name: "Thawed permafrost carbon change", unit: "PgC"}
+
+  # --- LAGGED / METRICS ---
+  D_CH4_lag: {sci_name: "ΔCH4_lag", long_name: "Lagged atmospheric CH4", unit: "ppb"}
+  D_N2O_lag: {sci_name: "ΔN2O_lag", long_name: "Lagged atmospheric N2O", unit: "ppb"}
+  D_Xhalo_lag: {sci_name: "ΔXhalo_lag", long_name: "Lagged atmospheric halogenated compounds", unit: "ppt"}
 
 # --- END OF REGISTRY ---

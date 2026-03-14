@@ -1,9 +1,35 @@
 # oscar/run.py
 from ._utils.help import show_info as _info
+from ._io._download import ensure_configured_library, ensure_customized_library
 
 def info(mode=None):
     """Entry point for terminal-based help."""
     return _info(mode)
+
+
+def download(mode="customized", hist_type=None, region=None):
+    """
+    Public data download helper.
+
+    Args:
+        mode (str): "customized" (default) or "configured".
+        hist_type (str): Required only for configured mode.
+        region (str): Required only for configured mode.
+
+    Returns:
+        Path to the downloaded/existing local library.
+    """
+    if mode == "customized":
+        return ensure_customized_library()
+
+    if mode == "configured":
+        if not hist_type or not region:
+            raise ValueError(
+                "Configured mode download requires both 'hist_type' and 'region'."
+            )
+        return ensure_configured_library(hist_type, region)
+
+    raise ValueError("Unknown mode. Supported values are: 'customized', 'configured'.")
 
 import sys
 from ._io.paths import resolve_data_root
