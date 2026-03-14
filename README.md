@@ -41,7 +41,7 @@ You can both **inspect** a mode and **execute** it from the Terminal or Python.
 | **General** | Package overview & guidance | `oscar` | `oscar.info()` | — | — | ✅ Available |
 | **Standard** | Instant verification simulation | `oscar info standard` | `oscar.info("standard")` | `oscar run` | `oscar.run()` | ✅ Available |
 | **Configured** | Official scenario library runs | `oscar info configured` | `oscar.info("configured")` | `oscar run -m configured` | `oscar.run(mode="configured")` | ✅ Available |
-| **Customized** | User-defined research workflows | — | `oscar.info("customized")` | — | `oscar.run(mode="customized")` | 🚧 In Development |
+| **Customized** | User-defined research workflows | — | `oscar.info("customized")` | — | `oscar.run(mode="customized")` |  ✅ Available |
 | **Advanced** | Core model development | — | — | — | `oscar.run(mode="advanced")` | 🚧 In Development |
 
 > **Note:** Scientific modes (Configured and above) require access to a large data library.  
